@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/christiangda/grpc-go-course/calculator/calculatorpb"
+	"github.com/christiangda/grpc-go-course/greet/greetpb"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -106,6 +107,10 @@ func (s *server) SquareRoot(ctx context.Context, req *calculatorpb.SquareRootReq
 	return &calculatorpb.SquareRootResponse{
 		NumberRoot: math.Sqrt(float64(number)),
 	}, nil
+
+}
+
+func (s *server) GreetWithDeadLine(ctx context.Context, req *greetpb.GreetWithDeadLineRequest) (*greetpb.GreetWithDeadLineResponse, error) {
 
 }
 

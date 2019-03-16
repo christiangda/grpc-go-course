@@ -165,5 +165,4 @@ func doErrorCall(c calculatorpb.CalculatorServiceClient, n int32) {
 		}
 	}
 	fmt.Printf("Result of square root of %v: %v\n", n, res.GetNumberRoot())
-	// error call
 }
