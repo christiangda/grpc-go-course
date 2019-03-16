@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
+
+	"google.golang.org/grpc/codes"
 
 	"github.com/christiangda/grpc-go-course/calculator/calculatorpb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 type server struct{}
@@ -64,6 +68,45 @@ func (s *server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAve
 		sum += req.GetNumber()
 		count++
 	}
+}
+
+func (s *server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServer) error {
+	fmt.Printf("Received Findmaximun RPC\n")
+	maximum := int32(0)
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error while reading client stream: %v\n", err)
+		}
+		number := req.GetNumber()
+		if number > maximum {
+			maximum = number
+			sendErr := stream.Send(&calculatorpb.FindMaximumResponse{
+				Maximum: float64(maximum),
+			})
+			if sendErr != nil {
+				log.Fatalf("Error while sending data to client: %v\n", sendErr)
+			}
+		}
+	}
+}
+
+func (s *server) SquareRoot(ctx context.Context, req *calculatorpb.SquareRootRequest) (*calculatorpb.SquareRootResponse, error) {
+	fmt.Printf("Received SquareRoot RPC\n")
+	number := req.GetNumber()
+
+	if number < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Received a negative number: %v", number)
+	}
+
+	return &calculatorpb.SquareRootResponse{
+		NumberRoot: math.Sqrt(float64(number)),
+	}, nil
+
 }
 
 func main() {
